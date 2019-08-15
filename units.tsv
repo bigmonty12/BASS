@@ -1,0 +1,5 @@
+sample	unit	fq1	fq2
+Control	1	Fastq/Control.1.1.fastq.gz	Fastq/Control.1.2.fastq.gz
+Control	2	Fastq/Control.2.1.fastq.gz	Fastq/Control.2.2.fastq.gz
+EtOH	1	Fastq/EtOH.1.1.fastq.gz	Fastq/EtOH.1.2.fastq.gz
+EtOH	2	Fastq/EtOH.2.1.fastq.gz	Fastq/EtOH.2.2.fastq.gz

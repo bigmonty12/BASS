@@ -1,0 +1,11 @@
+FileNotFoundError in line 14 of /Volumes/Bioinfo_Ext/snakemake-workflows/bulk-atac-seq/rules/common.Snakefile:
+[Errno 2] File b'/Volumes/Bioinfo_Ext/genomes/dmel_genome/bowtie_index/dm_6.ucsc.index' does not exist: b'/Volumes/Bioinfo_Ext/genomes/dmel_genome/bowtie_index/dm_6.ucsc.index'
+  File "/Volumes/Bioinfo_Ext/snakemake-workflows/bulk-atac-seq/Snakefile", line 1, in <module>
+  File "/Volumes/Bioinfo_Ext/snakemake-workflows/bulk-atac-seq/rules/common.Snakefile", line 14, in <module>
+  File "/anaconda3/lib/python3.7/site-packages/pandas/io/parsers.py", line 702, in parser_f
+  File "/anaconda3/lib/python3.7/site-packages/pandas/io/parsers.py", line 429, in _read
+  File "/anaconda3/lib/python3.7/site-packages/pandas/io/parsers.py", line 895, in __init__
+  File "/anaconda3/lib/python3.7/site-packages/pandas/io/parsers.py", line 1122, in _make_engine
+  File "/anaconda3/lib/python3.7/site-packages/pandas/io/parsers.py", line 1853, in __init__
+  File "pandas/_libs/parsers.pyx", line 387, in pandas._libs.parsers.TextReader.__cinit__
+  File "pandas/_libs/parsers.pyx", line 705, in pandas._libs.parsers.TextReader._setup_parser_source
