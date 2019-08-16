@@ -9,5 +9,21 @@ processing:
   remove-duplicates: true
 
 params:
+  trim-galore:
+    options: "--cores 6" # make sure cores match
+    cores: 6
+  bowtie2:
+    options: "--very-sensitive-local -X 2000"
+    cores: 8
+  samtools-view:
+    options: "-b -@ 4 -h -q 30 chr2L chr2R chr3L chr3R chrX" # make sure cores match
+    cores: 4
   picard:
     MarkDuplicates: "REMOVE_DUPLICATES=true"
+  macs2:
+    options: "-f BAM -g dm --nomodel --shift -37 --extsize 73 --call-summits --keep-dup all"
+  bam-coverage:
+    options: "--extendReads"
+
+deseq2:
+  samples: deseq2_samples.tsv

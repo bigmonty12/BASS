@@ -8,10 +8,10 @@
 - Samtools Index
 - Peak Calling (macs2)
 - Create bigwig (deeptools)
-- QC (Fastqc, multiqc, samtools stat)
-## Developmental Plans
 - Merge across conditions to find consensus peakset
-- Convert consensus peakset to .saf
+- QC (Fastqc, multiqc, samtools stat)
+
+## Developmental Plans
 - Differential peak analysis (DEseq2)
 - Footprinting analysis (rgt-hint?)
 - Peak annotation (homer? ChIPSeeker?)

@@ -47,7 +47,19 @@ def get_trimmed_reads(wildcards):
 
 def get_sample_bams(wildcards):
     """ Get all aligned reads of given sample."""
-    return expand("dedup/{sample}.{unit}.bam",
+    bams = expand("dedup/{sample}.{unit}.bam",
                   sample=wildcards.sample,
                   unit=units.loc[wildcards.sample].unit)
+    return bams
 
+
+def get1_merged_peaks(wildcards):
+    peaks = expand("macs2/{sample}-merged_peaks.narrowPeak",
+                   sample=units.index.get_level_values('sample').unique().values)
+    return peaks[0]
+
+
+def get_rest_merged_peaks(wildcards):
+    peaks = expand("macs2/{sample}-merged_peaks.narrowPeak",
+                   sample=units.index.get_level_values('sample').unique().values)
+    return peaks[1:]

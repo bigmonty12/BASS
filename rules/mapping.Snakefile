@@ -6,9 +6,9 @@ rule trim_galore_pe:
         temp("trimmed/{sample}.{unit}.1.fastq.gz_trimming_report.txt"),
         temp("trimmed/{sample}.{unit}.2_val_2.fq.gz"),
         temp("trimmed/{sample}.{unit}.2.fastq.gz_trimming_report.txt")
-    threads: 6
+    threads: config["params"]["trim-galore"]["cores"]
     params:
-        extra="--cores 6"
+        extra=config["params"]["trim-galore"]["options"]
     log:
         "logs/trim_galore/{sample}.{unit}.log"
     wrapper:
@@ -21,10 +21,10 @@ rule map_reads:
         temp("mapped/{sample}.{unit}.bam")
     log:
         "logs/bowtie2/{sample}.{unit}.log"
+    threads: config["params"]["bowtie2"]["cores"]
     params:
         index=config["ref"]["genome"],
-        extra="--very-sensitive-local -X 2000"
-    threads: 8
+        extra=config["params"]["bowtie2"]["options"]
     wrapper:
         "0.36.0/bio/bowtie2/align"
 
@@ -41,9 +41,9 @@ rule samtools_view:
         "mapped/{sample}.{unit}.bam"
     output:
         temp("mapped/{sample}.{unit}.filt.bam")
-    threads: 4
+    threads: config["params"]["samtools-view"]["cores"]
     params:
-        "-b -@ 4 -h -q 30 chr2L chr2R chr3L chr3R chrX"
+        config["params"]["samtools-view"]["options"]
     wrapper:
         "0.36.0/bio/samtools/view"
 
@@ -67,3 +67,15 @@ rule samtools_index:
         "dedup/{sample}.{unit}.bam.bai"
     wrapper:
         "0.36.0/bio/samtools/index"
+
+rule samtools_merge:
+    input:
+        sample=get_sample_bams
+    output:
+        protected("dedup/{sample}-merged.bam")
+    params:
+        ""
+    threads:
+        8
+    wrapper:
+        "0.36.0/bio/samtools/merge"
