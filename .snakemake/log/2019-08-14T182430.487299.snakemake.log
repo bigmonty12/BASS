@@ -1,3 +1,0 @@
-SyntaxError in line 26 of /Volumes/Bioinfo_Ext/snakemake-workflows/bulk-atac-seq/rules/mapping.Snakefile:
-invalid syntax
-  File "/Volumes/Bioinfo_Ext/snakemake-workflows/bulk-atac-seq/Snakefile", line 17, in <module>

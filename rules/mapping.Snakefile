@@ -11,8 +11,17 @@ rule trim_galore_pe:
         extra=config["params"]["trim-galore"]["options"]
     log:
         "logs/trim_galore/{sample}.{unit}.log"
-    wrapper:
-        "0.36.0/bio/trim_galore/pe"
+    conda: "../envs/trim_galore.yaml"
+    shell:
+        """
+        trim_galore \
+        {params.extra} \
+        --paired \
+        --output_dir trimmed \
+        {input} \
+        2> {log}
+
+        """
 
 rule map_reads:
     input:
@@ -28,9 +37,20 @@ rule map_reads:
     wrapper:
         "0.36.0/bio/bowtie2/align"
 
-rule first_index:
+rule sort_reads:
     input:
         "mapped/{sample}.{unit}.bam"
+    output:
+        temp("mapped/{sample}.{unit}.sorted.bam")
+    params:
+        config["params"]["samtools-sort"]["options"]
+    threads: config["params"]["samtools-sort"]["cores"]
+    wrapper:
+        "0.36.0/bio/samtools/sort"
+
+rule first_index:
+    input:
+        "mapped/{sample}.{unit}.sorted.bam"
     output:
         temp("mapped/{sample}.{unit}.bam.bai")
     wrapper:
@@ -38,14 +58,18 @@ rule first_index:
 
 rule samtools_view:
     input:
-        "mapped/{sample}.{unit}.bam"
+        bam="mapped/{sample}.{unit}.sorted.bam",
+        bai="mapped/{sample}.{unit}.sorted.bam.bai"
     output:
         temp("mapped/{sample}.{unit}.filt.bam")
     threads: config["params"]["samtools-view"]["cores"]
     params:
         config["params"]["samtools-view"]["options"]
-    wrapper:
-        "0.36.0/bio/samtools/view"
+    conda: "../envs/samtools.yaml"
+    shell:
+        """
+        samtools view {input.bam} {params} > {output}
+        """
 
 rule mark_duplicates:
     input:

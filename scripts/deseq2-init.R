@@ -1,9 +1,10 @@
-log <- file(snakemake@log[[1]]), open="wt")
+log <- file(snakemake@log[[1]], open="wt")
 sink(log)
 sink(log, type="message")
 
 library("DESeq2")
 library("dplyr")
+library("Rsubread")
 
 parallel <- FALSE
 if (snakemake@threads > 1) {
@@ -11,17 +12,21 @@ if (snakemake@threads > 1) {
     # setup parallelization
     register(MulticoreParam(snakemake@threads))
     parallel <- TRUE
-    threads <- snakemake@threads
 }
 
+threads <- snakemake@threads
+print(threads)
 
 # make sure colData and countData have the same sample order
-samples <- reads.table(
+samples <- read.table(
     snakemake@input[["samples"]],
     header = T)
 
 filenames <- snakemake@input[["bams"]]
 filenames <- strsplit(filenames, " ")
+wd <- getwd()
+filenames <- paste0(wd, "/", filenames)
+
 
 saf <- snakemake@input[["saf"]]
 

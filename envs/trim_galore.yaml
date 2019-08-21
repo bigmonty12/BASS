@@ -1,5 +1,5 @@
+name: trim_galore
 channels:
   - bioconda
 dependencies:
-  - pybigwig
-  - deeptools
+  - trim-galore

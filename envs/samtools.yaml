@@ -1,5 +1,5 @@
+name: samtools
 channels:
   - bioconda
 dependencies:
-  - pybigwig
-  - deeptools
+  - samtools

@@ -1,3 +1,6 @@
+# samples.tsv, units.tsv, and deseq2_samples.tsv should be in working
+#   directory as to keep track of each experiment's design
+
 samples: samples.tsv
 units: units.tsv
 
@@ -10,10 +13,13 @@ processing:
 
 params:
   trim-galore:
-    options: "--cores 6" # make sure cores match
-    cores: 6
+    options: "-j 4" # make sure cores match
+    cores: 4
   bowtie2:
     options: "--very-sensitive-local -X 2000"
+    cores: 8
+  samtools-sort:
+    options: "-m 4G"
     cores: 8
   samtools-view:
     options: "-b -@ 4 -h -q 30 chr2L chr2R chr3L chr3R chrX" # make sure cores match
@@ -27,3 +33,11 @@ params:
 
 deseq2:
   samples: deseq2_samples.tsv
+  contrasts:
+    treated-vs-untreated:
+      - treated
+      - untreated
+
+pca:
+  labels:
+    - condition

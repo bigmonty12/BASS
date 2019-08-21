@@ -10,9 +10,10 @@
 - Create bigwig (deeptools)
 - Merge across conditions to find consensus peakset
 - QC (Fastqc, multiqc, samtools stat)
+- Differential peak analysis (DEseq2)
+- PCA
 
 ## Developmental Plans
-- Differential peak analysis (DEseq2)
 - Footprinting analysis (rgt-hint?)
 - Peak annotation (homer? ChIPSeeker?)
-- Visualizations (PCA, FRiP, Peak Counts, other DEseq2 plots) 
+- Visualizations (Correlation/Heatmap, FRiP/PeakCounts, ReadLengthDistribution) 

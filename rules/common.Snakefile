@@ -1,8 +1,8 @@
 import pandas as pd
-report: "../report/workflow.rst"
+report: srcdir("../report/workflow.rst")
 
 # Config file and sample sheets #
-configfile: "config.yaml"
+configfile: srcdir("../config.yaml")
 
 samples = pd.read_table(config["samples"]).set_index("sample", drop=False)
 

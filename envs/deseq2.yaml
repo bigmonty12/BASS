@@ -17,6 +17,7 @@ dependencies:
   - bioconductor-genomeinfodbdata =1.0.0
   - bioconductor-genomicranges =1.30.0
   - bioconductor-iranges =2.12.0
+  - bioconductor-rsubread
   - bioconductor-s4vectors =0.16.0
   - bioconductor-summarizedexperiment =1.8.0
   - bioconductor-tximport =1.6.0
@@ -37,6 +38,7 @@ dependencies:
   - r-dbi =0.6_1
   - r-dichromat =2.0_0
   - r-digest =0.6.12
+  - r-dplyr
   - r-evaluate =0.10
   - r-foreign =0.8_67
   - r-formula =1.2_1

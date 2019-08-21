@@ -1,4 +1,0 @@
-KeyError in line 59 of /Volumes/Bioinfo_Ext/snakemake-workflows/bulk-atac-seq/rules/mapping.Snakefile:
-'params'
-  File "/Volumes/Bioinfo_Ext/snakemake-workflows/bulk-atac-seq/Snakefile", line 17, in <module>
-  File "/Volumes/Bioinfo_Ext/snakemake-workflows/bulk-atac-seq/rules/mapping.Snakefile", line 59, in <module>

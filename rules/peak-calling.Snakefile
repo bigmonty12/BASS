@@ -3,26 +3,33 @@ rule ind_peak_calling:
         bam="dedup/{sample}.{unit}.bam"
     output:
         peaks="macs2/{sample}.{unit}_peaks.narrowPeak",
-        excel="mac2/{sample}.{unit}_peaks.xls",
+        excel="macs2/{sample}.{unit}_peaks.xls",
         bed="macs2/{sample}.{unit}_summits.bed"
-    conda: "envs/macs2.yaml"
+    log:
+        "logs/macs2/{sample}.{unit}.log"
+    conda: "../envs/macs2.yaml"
     params:
         options=config["params"]["macs2"]["options"]
     shell:
-        "macs2 callpeak -t {input.bam} --name {wildcards.sample} --outdir macs2 {params.options}"
+        """
+        macs2 callpeak -t {input.bam} --name {wildcards.sample}.{wildcards.unit} --outdir macs2 {params.options} 2> {log}
+        """
 
 rule make_bigwig:
     input:
-        "dedup/{sample}.{unit}.bam"
+        bam="dedup/{sample}.{unit}.bam",
+        bai="dedup/{sample}.{unit}.bam.bai"
     output:
         "bw/{sample}.{unit}_coverage.bw"
     log:
         "logs/deeptools/{sample}.{unit}.log"
-    conda: "envs/deeptools.yaml"
+    conda: "../envs/deeptools.yaml"
     params:
         options=config["params"]["bam-coverage"]["options"]
     shell:
-        "bamCoverage -b {input} -o {output} {params.options}"
+        """
+        bamCoverage -b {input.bam} -o {output} {params.options} 2> {log}
+        """
 
 rule merged_peak_calling:
     input:
@@ -31,11 +38,15 @@ rule merged_peak_calling:
         peaks="macs2/{sample}-merged_peaks.narrowPeak",
         excel="macs2/{sample}-merged_peaks.xls",
         bed="macs2/{sample}-merged_summits.bed"
-    conda: "envs/macs2.yaml"
+    log:
+        "logs/macs2/{sample}-merged.log"
+    conda: "../envs/macs2.yaml"
     params:
         options=config["params"]["macs2"]["options"]
     shell:
-        "macs2 callpeak -t {input.bam} --name {wildcards.sample} --outdir macs2 {params.options}"
+        """
+        macs2 callpeak -t {input.bam} --name {wildcards.sample}-merged --outdir macs2 {params.options} 2> {log}
+        """
 
 rule intersect:
     input:
@@ -43,7 +54,7 @@ rule intersect:
         b=get_rest_merged_peaks
     output:
         "macs2/consensus_peaks.narrowPeak"
-    conda: "envs/bedtools.yaml"
+    conda: "../envs/bedtools.yaml"
     params:
         ""
     shell:
@@ -56,5 +67,5 @@ rule create_saf:
         "macs2/consensus_peaks.saf"
     shell:
         """
-        awk  '{{OFS="\t";print $1"."$2+1"."$3, $1, $2+1, $3, "."}}' {input} > {output}"
+        awk  '{{OFS="\t";print $1"."$2+1"."$3, $1, $2+1, $3, "."}}' {input} > {output}
         """

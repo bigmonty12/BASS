@@ -1,4 +1,4 @@
-log <- file(snakemake@log[[1]]), open="wt")
+log <- file(snakemake@log[[1]], open="wt")
 sink(log)
 sink(log, type="message")
 
@@ -36,8 +36,9 @@ plotMA(
     ylim=c(-2,2))
 dev.off()
 
+print(as.data.frame(res))
 write.table(
     as.data.frame(
-        res,
-        file=snakemake@output[["table"]]))
+        res),
+        file=snakemake@output[["table"]])
 
