@@ -10,6 +10,12 @@ units = pd.read_table(config["units"], dtype=str).set_index(["sample", "unit"],
                                                             drop=False)
 units.index = units.index.set_levels([i.astype(str) for i in units.index.levels])  # enforce str in index
 
+# Multiqc files
+qc_config = srcdir("../multiqc/multiqc_config.yaml")
+qc_peaks = srcdir("../multiqc/peak_count_header.txt")
+qc_frip = srcdir("../multiqc/frip_score_header.txt")
+qc_pca = srcdir("../multiqc/deseq2_pca_header.txt")
+qc_heatmap = srcdir("../multiqc/deseq2_clustering_header.txt")
 
 # Helper Functions #
 

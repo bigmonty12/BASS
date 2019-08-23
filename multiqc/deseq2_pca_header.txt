@@ -1,0 +1,11 @@
+#id: 'deseq2_pca'
+#section_name: 'DESeq2: PCA plot'
+#description: "PCA plot between samples in the experiment.
+#              These values are calculated using <a href='https://bioconductor.org/packages/release/bioc/html/DESeq2.html'>DESeq2</a>
+#              in the <a href='https://github.com/bigmonty12/bulk-atac-snake/blob/master/scripts/plot-pca.R'><code>plot-pca.R</code></a> script."
+#plot_type: 'scatter'
+#anchor: 'bigmonty12-bulk-snak-atac-deseq2_pca'
+#pconfig:
+#    title: 'DESeq2: Principal component plot'
+#    xlab: PC1
+#    ylab: PC2

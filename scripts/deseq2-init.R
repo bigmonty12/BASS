@@ -22,10 +22,11 @@ samples <- read.table(
     snakemake@input[["samples"]],
     header = T)
 
-filenames <- snakemake@input[["bams"]]
-filenames <- strsplit(filenames, " ")
-wd <- getwd()
-filenames <- paste0(wd, "/", filenames)
+dir <- snakemake@input[["bams"]]
+
+filenames <- file.path(
+    dir,
+    paste0(samples$SampleID, ".bam"))
 
 
 saf <- snakemake@input[["saf"]]
@@ -38,6 +39,9 @@ f_counts <- featureCounts(
     nthreads = threads)
 
 colnames(f_counts$counts) <- samples$SampleID
+
+stats <- f_counts[["stat"]]
+colnames(stats) <- c("Status", as.character(samples$SampleID))
 
 counts <- as.data.frame(
     f_counts$counts)
@@ -54,3 +58,10 @@ dds <- DESeq(dds, parallel=parallel)
 
 saveRDS(dds, file=snakemake@output[[1]])
 
+write.table(
+    as.data.frame(
+        stats),
+    file=snakemake@output[[2]],
+    quote=FALSE,
+    row.names=FALSE,
+    sep="\t")
