@@ -73,3 +73,17 @@ rule deseq2_report:
     threads: get_deseq2_threads
     script:
         "../scripts/deseq2.R"
+
+rule annotate:
+    input:
+        "results/diffexp/{contrast}.diffexp.tsv"
+    output:
+        "results/diffexp/annotate.{contrast}.diffexp.txt"
+    params:
+        genome=config["ref"]["name"]
+    conda: "../envs/homer.yaml"
+    shell:
+        """
+        perl "$CONDA_PREFIX"/share/homer-4.9.1-6/configureHomer.pl -install {params.genome}
+        annotatePeaks.pl {input} {params.genome} > {output}
+        """

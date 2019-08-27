@@ -11,8 +11,8 @@
 - Merge across conditions to find consensus peakset
 - QC (Fastqc, multiqc, samtools stat)
 - Differential peak analysis (DEseq2)
+- Homer Annotation
 - PCA, Heatmap
 
 ## Developmental Plans
 - Footprinting analysis (rgt-hint?)
-- Peak annotation (homer? ChIPSeeker?)

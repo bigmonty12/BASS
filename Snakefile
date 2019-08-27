@@ -12,6 +12,8 @@ rule all:
                unit=units.index.get_level_values('unit').unique().values),
         expand(["results/diffexp/{contrast}.diffexp.tsv",
                 "results/diffexp/{contrast}.ma-plot.svg"],
+               contrast=config["deseq2"]["contrasts"]),
+        expand("results/diffexp/annotate.{contrast}.diffexp.txt",
                contrast=config["deseq2"]["contrasts"])
 
 
