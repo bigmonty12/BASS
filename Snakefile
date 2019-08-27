@@ -1,18 +1,19 @@
 # Run with --directory option (and path of directory containing Fastq folder)
 
 include: srcdir("rules/common.Snakefile")
+
 # Target rules #
 
 rule all:
     input:
         "qc/multiqc.html",
-        "qc/peaks_qc/peaks.qc.txt",
         expand("bw/{sample}.{unit}_coverage.bw",
                sample=units.index.get_level_values('sample').unique().values,
                unit=units.index.get_level_values('unit').unique().values),
-        "results/pca.svg",
         expand(["results/diffexp/{contrast}.diffexp.tsv",
                 "results/diffexp/{contrast}.ma-plot.svg"],
+               contrast=config["deseq2"]["contrasts"]),
+        expand("results/diffexp/annotate.{contrast}.diffexp.txt",
                contrast=config["deseq2"]["contrasts"])
 
 

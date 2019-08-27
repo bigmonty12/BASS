@@ -4,6 +4,7 @@
 samples: samples.tsv
 units: units.tsv
 
+
 ref:
   name: dm6
   genome: /Volumes/Bioinfo_Ext/genomes/dmel_genome/bowtie_index/dm_6.ucsc.index

@@ -1,0 +1,12 @@
+#id: 'deseq2_clustering'
+#section_name: 'DESeq2: Sample similarity'
+#description: "is generated from clustering by Euclidean distances between
+#	       <a href='https://bioconductor.org/packages/release/bioc/html/DESeq2.html' target='_blank'>DESeq2</a>
+#              rlog values for each sample
+#              in the <a href='https://github.com/bigmonty12/bulk-atac-snake/blob/master/scripts/plot-pca.R'><code>plot-pca.R</code></a> script."
+#plot_type: 'heatmap'
+#anchor: 'bigmonty12-bulk-atac-snake-deseq2_clustering'
+#pconfig:
+#    title: 'DESeq2: Heatmap of the sample-to-sample distances'
+#    xlab: True
+#    reverseColors: True

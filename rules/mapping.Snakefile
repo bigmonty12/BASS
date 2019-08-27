@@ -84,6 +84,22 @@ rule mark_duplicates:
     wrapper:
         "0.36.0/bio/picard/markduplicates"
 
+rule insert_size:
+    input:
+        "dedup/{sample}.{unit}.bam"
+    output:
+        txt="qc/dedup/{sample}.{unit}.isize.txt",
+        pdf="qc/dedup/{sample}.{unit}.isize.pdf"
+    log:
+        "logs/picard/insert_size/{sample}.{unit}.log"
+    params:
+        # optional parameters (e.g. relax checks as below)
+        "VALIDATION_STRINGENCY=LENIENT "
+        "METRIC_ACCUMULATION_LEVEL=null "
+        "METRIC_ACCUMULATION_LEVEL=SAMPLE"
+    wrapper:
+        "0.36.0/bio/picard/collectinsertsizemetrics"
+
 rule samtools_index:
     input:
         "dedup/{sample}.{unit}.bam"
