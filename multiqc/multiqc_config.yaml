@@ -9,6 +9,8 @@ fn_clean_exts:
   - 'filt'
   - 'peaks.counts_mqc.tsv'
   - 'peaks.FRiP_mqc.tsv'
+  - 'features_mqc.tsv'
+  - 'df'
 
 module_order:
   - fastqc:
@@ -38,10 +40,12 @@ report_section_order:
     order: -1000
   frip_score:
     order: -1100
-  deseq2_pca:
+  homer_anno:
     order: -1200
-  deseq2_clustering:
+  deseq2_pca:
     order: -1300
+  deseq2_clustering:
+    order: -1400
 
 custom_plot_config:
   picard-insertsize:

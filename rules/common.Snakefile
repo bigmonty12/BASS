@@ -16,6 +16,7 @@ qc_peaks = srcdir("../multiqc/peak_count_header.txt")
 qc_frip = srcdir("../multiqc/frip_score_header.txt")
 qc_pca = srcdir("../multiqc/deseq2_pca_header.txt")
 qc_heatmap = srcdir("../multiqc/deseq2_clustering_header.txt")
+qc_homer = srcdir("../multiqc/homer_anno_header.txt")
 
 # Helper Functions #
 

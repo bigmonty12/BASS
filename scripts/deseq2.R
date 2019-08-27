@@ -47,7 +47,9 @@ res <- as.data.frame(res) %>%
             PeakID,
             baseMean,
             Strand,
-            dplyr::everything())
+            dplyr::everything()) %>%
+        dplyr::filter(
+            padj < snakemake@params[["pval"]])
 
 # store results
 svg(snakemake@output[["ma_plot"]])

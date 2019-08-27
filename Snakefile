@@ -7,13 +7,12 @@ include: srcdir("rules/common.Snakefile")
 rule all:
     input:
         "qc/multiqc.html",
-        expand("bw/{sample}.{unit}_coverage.bw",
+        expand(["bw/{sample}.{unit}_coverage.bw",
+               "macs2/homer/annotate.{sample}.{unit}.diffexp.txt"],
                sample=units.index.get_level_values('sample').unique().values,
                unit=units.index.get_level_values('unit').unique().values),
         expand(["results/diffexp/{contrast}.diffexp.tsv",
                 "results/diffexp/{contrast}.ma-plot.svg"],
-               contrast=config["deseq2"]["contrasts"]),
-        expand("results/diffexp/annotate.{contrast}.diffexp.txt",
                contrast=config["deseq2"]["contrasts"])
 
 

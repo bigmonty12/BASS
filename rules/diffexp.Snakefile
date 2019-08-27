@@ -66,7 +66,8 @@ rule deseq2_report:
                        caption="../report/ma_plot.rst",
                        category="DESeq2")
     params:
-        contrast=get_contrast
+        contrast=get_contrast,
+        pval=config["deseq2"]["pval"]
     conda: "../envs/deseq2.yaml"
     log:
         "logs/deseq2/{contrast}.diffexp.log"
@@ -74,16 +75,18 @@ rule deseq2_report:
     script:
         "../scripts/deseq2.R"
 
-rule annotate:
+rule annotate_diffexp:
     input:
         "results/diffexp/{contrast}.diffexp.tsv"
     output:
-        "results/diffexp/annotate.{contrast}.diffexp.txt"
+        anno="results/diffexp/homer/annotate.{contrast}.diffexp.txt",
+        stats="results/diffexp/homer/{contrast}.AnnotationStats.txt",
+        go=directory("results/diffexp/homer/{contrast}.go")
     params:
         genome=config["ref"]["name"]
     conda: "../envs/homer.yaml"
     shell:
         """
         perl "$CONDA_PREFIX"/share/homer-4.9.1-6/configureHomer.pl -install {params.genome}
-        annotatePeaks.pl {input} {params.genome} > {output}
+        annotatePeaks.pl {input} {params.genome} -annStats {output.stats} -go {output.go} > {output.anno}
         """

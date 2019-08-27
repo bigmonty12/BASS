@@ -38,6 +38,7 @@ deseq2:
     treated-vs-untreated:
       - treated
       - untreated
+  pval: 0.1
 
 pca:
   labels:

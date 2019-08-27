@@ -46,6 +46,29 @@ rule peaks_qc:
         printf "%s\t%8.3f\n" $name $frip | cat {params.frip} - > {output.frip}
 
         """
+rule homer_qc:
+    input:
+        "macs2/homer/{sample}.{unit}.AnnotationStats.txt"
+    output:
+        "qc/homer/{sample}.{unit}.features_mqc.tsv"
+    params:
+        homer=qc_homer
+    shell:
+        """
+        cut -f1,2 {input} | head -10 | sed '1d' | sort -n -k2 | cat {params.homer} - > {output}
+        """
+
+rule df_homer_qc:
+    input:
+        "results/diffexp/homer/{contrast}.AnnotationStats.txt"
+    output:
+        "qc/homer/{contrast}.df_features_mqc.tsv"
+    params:
+        homer=qc_homer
+    shell:
+        """
+        cut -f1,2 {input} | head -10 | sed '1d' | sort -n -k2 | cat {params.homer} - > {output}
+        """
 
 rule multiqc:
     input:
@@ -54,9 +77,12 @@ rule multiqc:
                 "qc/dedup/{sample}.{unit}.metrics.txt",
                 "qc/dedup/{sample}.{unit}.isize.pdf",
                 "qc/peaks_qc/{sample}.{unit}.peaks.FRiP_mqc.tsv",
-                "qc/peaks_qc/{sample}.{unit}.peaks.counts_mqc.tsv"],
+                "qc/peaks_qc/{sample}.{unit}.peaks.counts_mqc.tsv",
+                "qc/homer/{contrast}.features_mqc.tsv",
+                "qc/homer/{sample}.{unit}.features_mqc.tsv"],
                sample=units.index.get_level_values('sample').unique().values,
-               unit=units.index.get_level_values('unit').unique().values),
+               unit=units.index.get_level_values('unit').unique().values,
+               contrast=config["deseq2"]["contrasts"]),
         "qc/deseq2/featureCounts.summary",
         "qc/deseq2/pca.vals_mqc.tsv",
         "qc/deseq2/heatplot.vars_mqc.tsv"
@@ -79,4 +105,4 @@ rule multiqc:
         --force \
         -o qc \
         -n multiqc.html \
-        qc/peaks_qc qc/fastqc qc/samtools-stats qc/deseq2 qc/dedup > logs/multiqc/multiqc.log 2>&1"
+        qc/peaks_qc qc/fastqc qc/samtools-stats qc/deseq2 qc/dedup qc/homer > logs/multiqc/multiqc.log 2>&1"
