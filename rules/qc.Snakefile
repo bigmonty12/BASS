@@ -2,29 +2,29 @@ rule fastqc:
     input:
         unpack(get_fastq)
     output:
-        html="qc/fastqc/{sample}.{unit}.html",
-        zip="qc/fastqc/{sample}.{unit}_fastqc.zip"
+        html="qc/fastqc/{sample}.{unit,\d+}.html",
+        zip="qc/fastqc/{sample}.{unit,\d+}_fastqc.zip"
     wrapper:
         "0.36.0/bio/fastqc"
 
 rule samtools_stats:
     input:
-        "dedup/{sample}.{unit}.bam"
+        "dedup/{sample}.{unit,\d+}.bam"
     output:
-        "qc/samtools-stats/{sample}.{unit}.txt"
+        "qc/samtools-stats/{sample}.{unit,\d+}.txt"
     log:
-        "logs/samtools-stats/{sample}.{unit}.log"
+        "logs/samtools-stats/{sample}.{unit,\d+}.log"
     wrapper:
         "0.36.0/bio/samtools/stats"
 
 rule peaks_qc:
     input:
-        bam="dedup/{sample}.{unit}.bam",
+        bam="dedup/{sample}.{unit,\d+}.bam",
         peaks="macs2/{sample}-merged_peaks.narrowPeak",
-        peak="macs2/{sample}.{unit}_peaks.narrowPeak"
+        peak="macs2/{sample}.{unit,\d+}_peaks.narrowPeak"
     output:
-        peaks="qc/peaks_qc/{sample}.{unit}.peaks.counts_mqc.tsv",
-        frip="qc/peaks_qc/{sample}.{unit}.peaks.FRiP_mqc.tsv"
+        peaks="qc/peaks_qc/{sample}.{unit,\d+}.peaks.counts_mqc.tsv",
+        frip="qc/peaks_qc/{sample}.{unit,\d+}.peaks.FRiP_mqc.tsv"
     conda: "../envs/samtools.yaml"
     params:
         peaks=qc_peaks,
@@ -48,9 +48,9 @@ rule peaks_qc:
         """
 rule homer_qc:
     input:
-        "macs2/homer/{sample}.{unit}.AnnotationStats.txt"
+        "macs2/homer/{sample}.{unit,\d+}.AnnotationStats.txt"
     output:
-        "qc/homer/{sample}.{unit}.features_mqc.tsv"
+        "qc/homer/{sample}.{unit,\d+}.features_mqc.tsv"
     params:
         homer=qc_homer
     shell:
@@ -72,16 +72,15 @@ rule df_homer_qc:
 
 rule multiqc:
     input:
-        expand(["qc/samtools-stats/{sample}.{unit}.txt",
-                "qc/fastqc/{sample}.{unit}_fastqc.zip",
-                "qc/dedup/{sample}.{unit}.metrics.txt",
-                "qc/dedup/{sample}.{unit}.isize.pdf",
-                "qc/peaks_qc/{sample}.{unit}.peaks.FRiP_mqc.tsv",
-                "qc/peaks_qc/{sample}.{unit}.peaks.counts_mqc.tsv",
-                "qc/homer/{contrast}.features_mqc.tsv",
-                "qc/homer/{sample}.{unit}.features_mqc.tsv"],
-               sample=units.index.get_level_values('sample').unique().values,
-               unit=units.index.get_level_values('unit').unique().values,
+        expand(["qc/samtools-stats/{sample_unit}.txt",
+                "qc/fastqc/{sample_unit}_fastqc.zip",
+                "qc/dedup/{sample_unit}.metrics.txt",
+                "qc/dedup/{sample_unit}.isize.pdf",
+                "qc/peaks_qc/{sample_unit}.peaks.FRiP_mqc.tsv",
+                "qc/peaks_qc/{sample_unit}.peaks.counts_mqc.tsv",
+                "qc/homer/{contrast}.df_features_mqc.tsv",
+                "qc/homer/{sample_unit}.features_mqc.tsv"],
+               sample_unit=SAMPLE_UNITS,
                contrast=config["deseq2"]["contrasts"]),
         "qc/deseq2/featureCounts.summary",
         "qc/deseq2/pca.vals_mqc.tsv",

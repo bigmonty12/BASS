@@ -35,9 +35,15 @@ params:
 deseq2:
   samples: deseq2_samples.tsv
   contrasts:
-    treated-vs-untreated:
-      - treated
-      - untreated
+    Control-vs-Rac:
+      - Control
+      - Rac
+    Control-vs-Rsu:
+      - Control
+      - Rsu
+    Control-vs-Tsr:
+      - Control
+      - Tsr
   pval: 0.1
 
 pca:

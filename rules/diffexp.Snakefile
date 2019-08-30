@@ -87,6 +87,6 @@ rule annotate_diffexp:
     conda: "../envs/homer.yaml"
     shell:
         """
-        perl "$CONDA_PREFIX"/share/homer-4.9.1-6/configureHomer.pl -install {params.genome}
+        perl "$CONDA_PREFIX"/share/homer-4.10-0/configureHomer.pl -install {params.genome}
         annotatePeaks.pl {input} {params.genome} -annStats {output.stats} -go {output.go} > {output.anno}
         """

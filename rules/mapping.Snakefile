@@ -2,15 +2,15 @@ rule trim_galore_pe:
     input:
         unpack(get_fastq)
     output:
-        temp("trimmed/{sample}.{unit}.1_val_1.fq.gz"),
-        temp("trimmed/{sample}.{unit}.1.fastq.gz_trimming_report.txt"),
-        temp("trimmed/{sample}.{unit}.2_val_2.fq.gz"),
-        temp("trimmed/{sample}.{unit}.2.fastq.gz_trimming_report.txt")
+        temp("trimmed/{sample}.{unit,\d+}.1_val_1.fq.gz"),
+        temp("trimmed/{sample}.{unit,\d+}.1.fastq.gz_trimming_report.txt"),
+        temp("trimmed/{sample}.{unit,\d+}.2_val_2.fq.gz"),
+        temp("trimmed/{sample}.{unit,\d+}.2.fastq.gz_trimming_report.txt")
     threads: config["params"]["trim-galore"]["cores"]
     params:
         extra=config["params"]["trim-galore"]["options"]
     log:
-        "logs/trim_galore/{sample}.{unit}.log"
+        "logs/trim_galore/{sample}.{unit,\d+}.log"
     conda: "../envs/trim_galore.yaml"
     shell:
         """
@@ -27,9 +27,9 @@ rule map_reads:
     input:
         sample=get_trimmed_reads
     output:
-        temp("mapped/{sample}.{unit}.bam")
+        temp("mapped/{sample}.{unit,\d+}.bam")
     log:
-        "logs/bowtie2/{sample}.{unit}.log"
+        "logs/bowtie2/{sample}.{unit,\d+}.log"
     threads: config["params"]["bowtie2"]["cores"]
     params:
         index=config["ref"]["genome"],
@@ -39,9 +39,9 @@ rule map_reads:
 
 rule sort_reads:
     input:
-        "mapped/{sample}.{unit}.bam"
+        "mapped/{sample}.{unit,\d+}.bam"
     output:
-        temp("mapped/{sample}.{unit}.sorted.bam")
+        temp("mapped/{sample}.{unit,\d+}.sorted.bam")
     params:
         config["params"]["samtools-sort"]["options"]
     threads: config["params"]["samtools-sort"]["cores"]
@@ -50,18 +50,18 @@ rule sort_reads:
 
 rule first_index:
     input:
-        "mapped/{sample}.{unit}.sorted.bam"
+        "mapped/{sample}.{unit,\d+}.sorted.bam"
     output:
-        temp("mapped/{sample}.{unit}.bam.bai")
+        temp("mapped/{sample}.{unit,\d+}.bam.bai")
     wrapper:
         "0.36.0/bio/samtools/index"
 
 rule samtools_view:
     input:
-        bam="mapped/{sample}.{unit}.sorted.bam",
-        bai="mapped/{sample}.{unit}.sorted.bam.bai"
+        bam="mapped/{sample}.{unit,\d+}.sorted.bam",
+        bai="mapped/{sample}.{unit,\d+}.sorted.bam.bai"
     output:
-        temp("mapped/{sample}.{unit}.filt.bam")
+        temp("mapped/{sample}.{unit,\d+}.filt.bam")
     threads: config["params"]["samtools-view"]["cores"]
     params:
         config["params"]["samtools-view"]["options"]
@@ -73,12 +73,12 @@ rule samtools_view:
 
 rule mark_duplicates:
     input:
-        "mapped/{sample}.{unit}.filt.bam"
+        "mapped/{sample}.{unit,\d+}.filt.bam"
     output:
-        bam=protected("dedup/{sample}.{unit}.bam"),
-        metrics="qc/dedup/{sample}.{unit}.metrics.txt"
+        bam=protected("dedup/{sample}.{unit,\d+}.bam"),
+        metrics="qc/dedup/{sample}.{unit,\d+}.metrics.txt"
     log:
-        "logs/picard/dedup/{sample}.{unit}.log"
+        "logs/picard/dedup/{sample}.{unit,\d+}.log"
     params:
         config["params"]["picard"]["MarkDuplicates"]
     wrapper:
@@ -86,12 +86,12 @@ rule mark_duplicates:
 
 rule insert_size:
     input:
-        "dedup/{sample}.{unit}.bam"
+        "dedup/{sample}.{unit,\d+}.bam"
     output:
-        txt="qc/dedup/{sample}.{unit}.isize.txt",
-        pdf="qc/dedup/{sample}.{unit}.isize.pdf"
+        txt="qc/dedup/{sample}.{unit,\d+}.isize.txt",
+        pdf="qc/dedup/{sample}.{unit,\d+}.isize.pdf"
     log:
-        "logs/picard/insert_size/{sample}.{unit}.log"
+        "logs/picard/insert_size/{sample}.{unit,\d+}.log"
     params:
         # optional parameters (e.g. relax checks as below)
         "VALIDATION_STRINGENCY=LENIENT "
@@ -102,9 +102,9 @@ rule insert_size:
 
 rule samtools_index:
     input:
-        "dedup/{sample}.{unit}.bam"
+        "dedup/{sample}.{unit,\d+}.bam"
     output:
-        "dedup/{sample}.{unit}.bam.bai"
+        "dedup/{sample}.{unit,\d+}.bam.bai"
     wrapper:
         "0.36.0/bio/samtools/index"
 

@@ -28,6 +28,8 @@ filenames <- file.path(
     dir,
     paste0(samples$SampleID, ".bam"))
 
+print(samples$SampleID)
+print(filenames)
 
 saf <- snakemake@input[["saf"]]
 
