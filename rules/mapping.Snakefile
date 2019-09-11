@@ -52,7 +52,7 @@ rule first_index:
     input:
         "mapped/{sample}.{unit,\d+}.sorted.bam"
     output:
-        temp("mapped/{sample}.{unit,\d+}.bam.bai")
+        temp("mapped/{sample}.{unit,\d}.sorted.bam.bai")
     wrapper:
         "0.36.0/bio/samtools/index"
 
