@@ -4,6 +4,7 @@
 samples: samples.tsv
 units: units.tsv
 
+
 ref:
   name: dm6
   genome: /Volumes/Bioinfo_Ext/genomes/dmel_genome/bowtie_index/dm_6.ucsc.index
@@ -34,9 +35,16 @@ params:
 deseq2:
   samples: deseq2_samples.tsv
   contrasts:
-    treated-vs-untreated:
-      - treated
-      - untreated
+    Control-vs-Rac:
+      - Control
+      - Rac
+    Control-vs-Rsu:
+      - Control
+      - Rsu
+    Control-vs-Tsr:
+      - Control
+      - Tsr
+  pval: 0.1
 
 pca:
   labels:

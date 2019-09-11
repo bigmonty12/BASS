@@ -28,17 +28,42 @@ res <- lfcShrink(
     res=res)
 # sort by p-value
 res <- res[order(res$padj),]
+res_ma <- res
+# add peak ranges for annotation
+r <- rownames(res)
+r_split <- strsplit(r, ".", 2)
+
+res$PeakID <- r
+res$Chr <- sapply(r_split, "[", 1)
+res$Start <- sapply(r_split, "[", 2)
+res$End <- sapply(r_split, "[", 3)
+res$Strand <- "."
+
+res <- as.data.frame(res) %>%
+        dplyr::select(
+            Chr,
+            Start,
+            End,
+            PeakID,
+            baseMean,
+            Strand,
+            dplyr::everything()) %>%
+        dplyr::filter(
+            padj < snakemake@params[["pval"]])
 
 # store results
 svg(snakemake@output[["ma_plot"]])
 plotMA(
-    res,
+    res_ma,
     ylim=c(-2,2))
 dev.off()
 
-print(as.data.frame(res))
 write.table(
-    as.data.frame(
-        res),
+        res,
+        row.names=F,
+        col.names=F,
+        quote=F,
+        sep="\t",
         file=snakemake@output[["table"]])
+
 

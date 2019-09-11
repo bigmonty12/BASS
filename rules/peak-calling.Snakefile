@@ -1,12 +1,12 @@
 rule ind_peak_calling:
     input:
-        bam="dedup/{sample}.{unit}.bam"
+        bam="dedup/{sample}.{unit,\d+}.bam"
     output:
-        peaks="macs2/{sample}.{unit}_peaks.narrowPeak",
-        excel="macs2/{sample}.{unit}_peaks.xls",
-        bed="macs2/{sample}.{unit}_summits.bed"
+        peaks="macs2/{sample}.{unit,\d+}_peaks.narrowPeak",
+        excel="macs2/{sample}.{unit,\d+}_peaks.xls",
+        bed="macs2/{sample}.{unit,\d+}_summits.bed"
     log:
-        "logs/macs2/{sample}.{unit}.log"
+        "logs/macs2/{sample}.{unit,\d+}.log"
     conda: "../envs/macs2.yaml"
     params:
         options=config["params"]["macs2"]["options"]
@@ -14,15 +14,28 @@ rule ind_peak_calling:
         """
         macs2 callpeak -t {input.bam} --name {wildcards.sample}.{wildcards.unit} --outdir macs2 {params.options} 2> {log}
         """
-
+rule homer:
+    input:
+        peaks="macs2/{sample}.{unit,\d+}_peaks.narrowPeak"
+    output:
+        anno="macs2/homer/annotate.{sample}.{unit,\d+}.diffexp.txt",
+        stats="macs2/homer/{sample}.{unit,\d+}.AnnotationStats.txt"
+    params:
+        genome=config["ref"]["name"]
+    conda: "../envs/homer.yaml"
+    shell:
+        """
+        perl "$CONDA_PREFIX"/share/homer-4.10-0/configureHomer.pl -install {params.genome}
+        annotatePeaks.pl {input.peaks} {params.genome} -annStats {output.stats} > {output.anno}
+        """
 rule make_bigwig:
     input:
-        bam="dedup/{sample}.{unit}.bam",
-        bai="dedup/{sample}.{unit}.bam.bai"
+        bam="dedup/{sample}.{unit,\d+}.bam",
+        bai="dedup/{sample}.{unit,\d+}.bam.bai"
     output:
-        "bw/{sample}.{unit}_coverage.bw"
+        "bw/{sample}.{unit,\d+}_coverage.bw"
     log:
-        "logs/deeptools/{sample}.{unit}.log"
+        "logs/deeptools/{sample}.{unit,\d+}.log"
     conda: "../envs/deeptools.yaml"
     params:
         options=config["params"]["bam-coverage"]["options"]

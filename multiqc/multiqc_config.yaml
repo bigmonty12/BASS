@@ -1,0 +1,56 @@
+skip_generalstats: true
+
+export_plots: true
+
+fn_clean_exts:
+  - 'bam'
+  - 'fastq.gz'
+  - '_val'
+  - 'filt'
+  - 'peaks.counts_mqc.tsv'
+  - 'peaks.FRiP_mqc.tsv'
+  - 'features_mqc.tsv'
+  - 'df'
+
+module_order:
+  - fastqc:
+      name: 'FastQC (raw)'
+      info: 'This section of the report shows FastQC results before adapter trimming.'
+      path_filters: 
+        - '*_fastqc.zip'
+      path_filters_exclude: 
+        - '*val*_fastqc.zip'
+        - '*trimmed_fastqc.zip'
+  - samtools:
+      name: 'SAMTools'
+      info: 'This section of the report shows SAMTools results for individual libraries'
+      path_filters:
+        - '*bam'
+  - picard:
+      name: 'Picard'
+      info: 'This section of the reports shows picard deduplication and insert size results for individual libraries'
+  - featureCounts:
+      name: 'featureCounts'
+      info: 'This section of the report shows featureCounts for the number of reads assigned to merged replicate consensus peaks'
+      path_filters:
+        - '*featureCounts*'
+
+report_section_order:
+  peak_count:
+    order: -1000
+  frip_score:
+    order: -1100
+  homer_anno:
+    order: -1200
+  deseq2_pca:
+    order: -1300
+  deseq2_clustering:
+    order: -1400
+
+custom_plot_config:
+  picard-insertsize:
+    cpswitch_c_active: False
+    smooth_points: 1000
+
+  featurecounts:
+    cpswitch_c_active: False     

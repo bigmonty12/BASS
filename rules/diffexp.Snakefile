@@ -7,12 +7,11 @@ def get_deseq2_threads(wildcards=None):
 rule deseq2_init:
     input:
         samples=config["deseq2"]["samples"],
-        bams=expand(("dedup/{sample}.{unit}.bam"),
-                    sample=units.index.get_level_values('sample').unique().values,
-                    unit=units.index.get_level_values('unit').unique().values),
+        bams="dedup",
         saf="macs2/consensus_peaks.saf"
     output:
-        "deseq2/all.rds"
+        dds="deseq2/all.rds",
+        fc="qc/deseq2/featureCounts.summary"
     conda: "../envs/deseq2.yaml"
     log:
         "logs/deseq2/init.log"
@@ -21,18 +20,35 @@ rule deseq2_init:
         "../scripts/deseq2-init.R"
 
 
-rule pca:
+rule pca_heatmap:
     input:
         "deseq2/all.rds"
     output:
-        report("results/pca.svg", caption="../report/pca.rst", category="DESeq2")
+        pca="results/pca.vals.txt",
+        heatplot="results/heatplot.vals.txt"
     params:
         pca_labels=config["pca"]["labels"]
     conda: "../envs/deseq2.yaml"
     log:
-        "logs/pca.log"
+        "logs/deseq2/pca.log"
     script:
         "../scripts/plot-pca.R"
+
+rule deseq_multiqc:
+    input:
+        pca="results/pca.vals.txt",
+        heatmap="results/heatplot.vals.txt"
+    output:
+        pca="qc/deseq2/pca.vals_mqc.tsv",
+        heatmap="qc/deseq2/heatplot.vars_mqc.tsv"
+    params:
+        pca=qc_pca,
+        heatmap=qc_heatmap
+    shell:
+        """
+        cat {params.pca} {input.pca} > {output.pca}
+        cat {params.heatmap} {input.heatmap} > {output.heatmap}
+        """
 
 
 def get_contrast(wildcards):
@@ -50,10 +66,27 @@ rule deseq2_report:
                        caption="../report/ma_plot.rst",
                        category="DESeq2")
     params:
-        contrast=get_contrast
+        contrast=get_contrast,
+        pval=config["deseq2"]["pval"]
     conda: "../envs/deseq2.yaml"
     log:
         "logs/deseq2/{contrast}.diffexp.log"
     threads: get_deseq2_threads
     script:
         "../scripts/deseq2.R"
+
+rule annotate_diffexp:
+    input:
+        "results/diffexp/{contrast}.diffexp.tsv"
+    output:
+        anno="results/diffexp/homer/annotate.{contrast}.diffexp.txt",
+        stats="results/diffexp/homer/{contrast}.AnnotationStats.txt",
+        go=directory("results/diffexp/homer/{contrast}.go")
+    params:
+        genome=config["ref"]["name"]
+    conda: "../envs/homer.yaml"
+    shell:
+        """
+        perl "$CONDA_PREFIX"/share/homer-4.10-0/configureHomer.pl -install {params.genome}
+        annotatePeaks.pl {input} {params.genome} -annStats {output.stats} -go {output.go} > {output.anno}
+        """

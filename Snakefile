@@ -1,19 +1,21 @@
 # Run with --directory option (and path of directory containing Fastq folder)
 
 include: srcdir("rules/common.Snakefile")
+
 # Target rules #
+
+SAMPLE_UNITS = create_combos(sample_units)
 
 rule all:
     input:
         "qc/multiqc.html",
-        "qc/peaks_qc/peaks.qc.txt",
-        expand("bw/{sample}.{unit}_coverage.bw",
-               sample=units.index.get_level_values('sample').unique().values,
-               unit=units.index.get_level_values('unit').unique().values),
-        "results/pca.svg",
+        expand(["bw/{sample_unit}_coverage.bw",
+               "macs2/homer/annotate.{sample_unit}.diffexp.txt"],
+               sample_unit=SAMPLE_UNITS),
         expand(["results/diffexp/{contrast}.diffexp.tsv",
                 "results/diffexp/{contrast}.ma-plot.svg"],
-               contrast=config["deseq2"]["contrasts"])
+               contrast=config["deseq2"]["contrasts"]),
+
 
 
 # Modules #
