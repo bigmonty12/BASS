@@ -1,5 +1,5 @@
 channels:
   - bioconda
 dependencies:
-  - pybigwig
-  - deeptools
+  - pybigwig=0.3.17
+  - deeptools=3.1.3
