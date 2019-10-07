@@ -3,3 +3,4 @@ channels:
   - bioconda
 dependencies:
   - samtools=1.9
+  - htslib=1.9

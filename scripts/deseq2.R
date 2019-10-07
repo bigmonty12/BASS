@@ -13,10 +13,10 @@ if (snakemake@threads > 1) {
     parallel <- TRUE
     threads <- snakemake@threads
 }
+dds <- readRDS(snakemake@input[["rds"]])
 
-dds <- readRDS(snakemake@input[[1]])
-
-contrast <- c("condition", snakemake@params[["contrast"]])
+contrast <- c(snakemake@params[["contrast_name"]])
+print(snakemake@params[["contrast_name"]])
 res <- results(
     dds,
     contrast=contrast,
@@ -65,5 +65,3 @@ write.table(
         quote=F,
         sep="\t",
         file=snakemake@output[["table"]])
-
-

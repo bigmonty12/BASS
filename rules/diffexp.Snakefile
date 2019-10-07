@@ -4,17 +4,26 @@ def get_deseq2_threads(wildcards=None):
     return 1 if len(samples) < 100 or few_coeffs else 6
 
 
+def get_design(wildcards):
+    return config["deseq2"]["designs"][wildcards.design]
+
+def get_contrast(wildcards):
+   x = str(wildcards.design) + "." + str( wildcards.contrast)
+   return config["deseq2"]["contrasts"][x]
+
 rule deseq2_init:
     input:
         samples=config["deseq2"]["samples"],
-        bams="dedup",
+        # bams="dedup",
         saf="macs2/consensus_peaks.saf"
     output:
-        dds="deseq2/all.rds",
-        fc="qc/deseq2/featureCounts.summary"
+        dds="deseq2/{design}.rds",
+        fc="qc/deseq2/{design}.featureCounts.summary"
+    params:
+        design=get_design
     conda: "../envs/deseq2.yaml"
     log:
-        "logs/deseq2/init.log"
+        "logs/deseq2/{design}.init.log"
     threads: get_deseq2_threads()
     script:
         "../scripts/deseq2-init.R"
@@ -22,7 +31,7 @@ rule deseq2_init:
 
 rule pca_heatmap:
     input:
-        "deseq2/all.rds"
+        "deseq2/condition.rds"
     output:
         pca="results/pca.vals.txt",
         heatplot="results/heatplot.vals.txt"
@@ -51,37 +60,33 @@ rule deseq_multiqc:
         """
 
 
-def get_contrast(wildcards):
-    return config["deseq2"]["contrasts"][wildcards.contrast]
-
-
 rule deseq2_report:
     input:
-        "deseq2/all.rds"
+        rds="deseq2/{design}.rds"
     output:
-        table=report("results/diffexp/{contrast}.diffexp.tsv",
+        table=report("results/diffexp/{design}.{contrast}.diffexp.tsv",
                      caption="../report/de_table.rst",
                      category="DESeq2"),
-        ma_plot=report("results/diffexp/{contrast}.ma-plot.svg",
+        ma_plot=report("results/diffexp/{design}.{contrast}.ma-plot.svg",
                        caption="../report/ma_plot.rst",
                        category="DESeq2")
     params:
-        contrast=get_contrast,
+        contrast_name=get_contrast,
         pval=config["deseq2"]["pval"]
     conda: "../envs/deseq2.yaml"
     log:
-        "logs/deseq2/{contrast}.diffexp.log"
-    threads: get_deseq2_threads
+        "logs/deseq2/{design}.{contrast}.diffexp.log"
+    threads: get_deseq2_threads()
     script:
         "../scripts/deseq2.R"
 
 rule annotate_diffexp:
     input:
-        "results/diffexp/{contrast}.diffexp.tsv"
+        "results/diffexp/{design}.{contrast}.diffexp.tsv"
     output:
-        anno="results/diffexp/homer/annotate.{contrast}.diffexp.txt",
-        stats="results/diffexp/homer/{contrast}.AnnotationStats.txt",
-        go=directory("results/diffexp/homer/{contrast}.go")
+        anno="results/diffexp/homer/annotate.{design}.{contrast}.diffexp.txt",
+        stats="results/diffexp/homer/{design}.{contrast}.AnnotationStats.txt",
+        go=directory("results/diffexp/homer/{design}.{contrast}.go")
     params:
         genome=config["ref"]["name"]
     conda: "../envs/homer.yaml"

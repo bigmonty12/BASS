@@ -14,7 +14,7 @@ rule all:
                sample_unit=SAMPLE_UNITS),
         expand(["results/diffexp/{contrast}.diffexp.tsv",
                 "results/diffexp/{contrast}.ma-plot.svg"],
-               contrast=config["deseq2"]["contrasts"]),
+               contrast=config["deseq2"]["contrasts"])
 
 
 

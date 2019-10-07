@@ -22,8 +22,10 @@ samples <- read.table(
     snakemake@input[["samples"]],
     header = T)
 
-dir <- snakemake@input[["bams"]]
+print(samples)
 
+# dir <- snakemake@input[["bams"]]
+dir <- "dedup"
 filenames <- file.path(
     dir,
     paste0(samples$SampleID, ".bam"))
@@ -48,10 +50,25 @@ colnames(stats) <- c("Status", as.character(samples$SampleID))
 counts <- as.data.frame(
     f_counts$counts)
 
-dds <- DESeqDataSetFromMatrix(
-    counts,
-    samples,
-    design = ~condition)
+dds_design = snakemake@params[["design"]]
+
+if (dds_design == 'condition') {
+    dds <- DESeqDataSetFromMatrix(
+        counts,
+        samples,
+        design = ~condition) 
+} else if (dds_design == 'Factor') {
+    dds <- DESeqDataSetFromMatrix(
+        counts,
+        samples,
+        design = ~Factor)
+} else if (dds_design == 'Tissue') {
+    dds <- DESeqDataSetFromMatrix(
+        counts,
+        samples,
+        design = ~Tissue)
+}
+
 
 keep <- rowSums(counts(dds)) >= 10
 dds <- dds[keep,]
