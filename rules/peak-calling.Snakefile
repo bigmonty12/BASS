@@ -14,9 +14,27 @@ rule ind_peak_calling:
         """
         macs2 callpeak -t {input.bam} --name {wildcards.sample}.{wildcards.unit} --outdir macs2 {params.options} 2> {log}
         """
+'''
+rule homer_dirs:
+    output: 
+        touch(directory("macs2/homer/{sample}.{unit, \d+}"))
+
+rule homerMotifs:
+    input:
+        peaks="macs2/{sample}.{unit,\d+}_peaks.narrowPeak",
+        dir="macs2/homer/{sample}.{unit, \d+}"
+    params:
+        genome=config["ref"]["name"]
+    conda: "../envs/homer.yaml"
+    shell:
+        """
+        perl "$CONDA_PREFIX"/share/homer-4.10-0/configureHomer.pl -install {params.genome}
+        findMotifsGenome.pl {input.peaks} {params.genome} {input.dir} -size 50 
+        """
+'''
 rule homer:
     input:
-        peaks="macs2/{sample}.{unit,\d+}_peaks.narrowPeak"
+        "macs2/{sample}.{unit,\d+}_peaks.narrowPeak"
     output:
         anno="macs2/homer/annotate.{sample}.{unit,\d+}.diffexp.txt",
         stats="macs2/homer/{sample}.{unit,\d+}.AnnotationStats.txt"
@@ -26,7 +44,7 @@ rule homer:
     shell:
         """
         perl "$CONDA_PREFIX"/share/homer-4.10-0/configureHomer.pl -install {params.genome}
-        annotatePeaks.pl {input.peaks} {params.genome} -annStats {output.stats} > {output.anno}
+        annotatePeaks.pl {input} {params.genome} -annStats {output.stats} > {output.anno}
         """
 rule make_bigwig:
     input:
@@ -61,7 +79,7 @@ rule merged_peak_calling:
         macs2 callpeak -t {input.bam} --name {wildcards.sample}-merged --outdir macs2 {params.options} 2> {log}
         """
 
-rule intersect:
+rule create_consensus:
     input:
         a=get1_merged_peaks,
         b=get_rest_merged_peaks
@@ -71,7 +89,7 @@ rule intersect:
     params:
         ""
     shell:
-        "bedtools intersect -a {input.a} -b {input.b} > {output}"
+        "cat {input.a} {input.b} | sort -k1,1 -k2,2n | bedtools merge -i - > {output}"
 
 rule create_saf:
     input:

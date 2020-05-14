@@ -2,17 +2,18 @@ name: multiqc
 channels:
   - bioconda
   - defaults
+  - conda-forge
 dependencies:
 
   ## bioconda packages
   - fastqc=0.11.8
-  - trim-galore=0.5.0
+  - trim-galore=0.6.2
   - samtools=1.9
-  - picard=2.19.0
-  - pysam=0.15.2
-  - bedtools=2.27.1
-  - macs2=2.1.2
+  - picard=2.20.8
+  - pysam=0.15.3
+  - bedtools=2.29.0
+  - macs2=2.1.4
   - subread=1.6.4
   - multiqc=1.7
-  - bioconductor-deseq2=1.20.0
-  - bioconductor-vsn=3.46.0
+  - bioconductor-deseq2=1.24.0
+  - bioconductor-vsn=3.52.0

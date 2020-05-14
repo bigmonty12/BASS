@@ -1,9 +1,24 @@
+def get_designs(wildcards):
+    return config["deseq2"]["designs"][wildcards.design]
+
+def get_contrast(wildcards):
+    return config["deseq2"]["designs"][wildcards.design]["contrasts"][wildcards.constant]
+
 rule fastqc:
     input:
         unpack(get_fastq)
     output:
         html="qc/fastqc/{sample}.{unit,\d+}.html",
         zip="qc/fastqc/{sample}.{unit,\d+}_fastqc.zip"
+    wrapper:
+        "0.36.0/bio/fastqc"
+
+rule trimmed_fastqc:
+    input:
+        unpack(get_trimmed_reads)
+    output:
+        html="qc/fastqc/trimmed_{sample}.{unit,\d+}.html",
+        zip="qc/fastqc/trimmed_{sample}.{unit,\d+}_fastqc.zip"
     wrapper:
         "0.36.0/bio/fastqc"
 
@@ -60,9 +75,9 @@ rule homer_qc:
 
 rule df_homer_qc:
     input:
-        "results/diffexp/homer/{contrast}.AnnotationStats.txt"
+        "results/diffexp/homer/{design}.{contrast}.AnnotationStats.txt"
     output:
-        "qc/homer/{contrast}.df_features_mqc.tsv"
+        "qc/homer/{design}.{contrast}.df_features_mqc.tsv"
     params:
         homer=qc_homer
     shell:
@@ -74,6 +89,7 @@ rule multiqc:
     input:
         expand(["qc/samtools-stats/{sample_unit}.txt",
                 "qc/fastqc/{sample_unit}_fastqc.zip",
+                "qc/fastqc/trimmed_{sample_unit}_fastqc.zip",
                 "qc/dedup/{sample_unit}.metrics.txt",
                 "qc/dedup/{sample_unit}.isize.pdf",
                 "qc/peaks_qc/{sample_unit}.peaks.FRiP_mqc.tsv",

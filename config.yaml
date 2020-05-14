@@ -23,7 +23,7 @@ params:
     options: "-m 4G"
     cores: 8
   samtools-view:
-    options: "-b -@ 4 -h -q 30 chr2L chr2R chr3L chr3R chrX" # make sure cores match
+    options: "-b -@ 4 -f 2 -h -q 30 chr2L chr2R chr3L chr3R chrX" # make sure cores match
     cores: 4
   picard:
     MarkDuplicates: "REMOVE_DUPLICATES=true"

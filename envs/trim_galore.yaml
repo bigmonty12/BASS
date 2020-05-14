@@ -2,4 +2,4 @@ name: trim_galore
 channels:
   - bioconda
 dependencies:
-  - trim-galore
+  - trim-galore=0.6.4

@@ -1,11 +1,11 @@
 rule trim_galore_pe:
     input:
-        unpack(get_fastq)
+        get_fastq
     output:
-        temp("trimmed/{sample}.{unit,\d+}.1_val_1.fq.gz"),
-        temp("trimmed/{sample}.{unit,\d+}.1.fastq.gz_trimming_report.txt"),
-        temp("trimmed/{sample}.{unit,\d+}.2_val_2.fq.gz"),
-        temp("trimmed/{sample}.{unit,\d+}.2.fastq.gz_trimming_report.txt")
+        "trimmed/{sample}.{unit,\d+}.1_val_1.fq.gz",
+        "trimmed/{sample}.{unit,\d+}.1.fastq.gz_trimming_report.txt",
+        "trimmed/{sample}.{unit,\d+}.2_val_2.fq.gz",
+        "trimmed/{sample}.{unit,\d+}.2.fastq.gz_trimming_report.txt"
     threads: config["params"]["trim-galore"]["cores"]
     params:
         extra=config["params"]["trim-galore"]["options"]
