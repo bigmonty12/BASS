@@ -4,7 +4,6 @@ sink(log, type="message")
 
 library("DESeq2")
 library("dplyr")
-library("Rsubread")
 
 parallel <- FALSE
 if (snakemake@threads > 1) {
@@ -15,43 +14,16 @@ if (snakemake@threads > 1) {
 }
 
 threads <- snakemake@threads
-print(threads)
 
 # make sure colData and countData have the same sample order
 samples <- read.table(
     snakemake@input[["samples"]],
     header = T)
-
 print(samples)
-
-# dir <- snakemake@input[["bams"]]
-dir <- "dedup"
-filenames <- file.path(
-    dir,
-    paste0(samples$SampleID, ".bam"))
-
-print(samples$SampleID)
-print(filenames)
-
-saf <- snakemake@input[["saf"]]
-
-f_counts <- featureCounts(
-    files = filenames,
-    annot.ext = saf,
-    isGTFAnnotationFile = FALSE,
-    isPairedEnd = TRUE,
-    nthreads = threads)
-
-colnames(f_counts$counts) <- samples$SampleID
-
-stats <- f_counts[["stat"]]
-colnames(stats) <- c("Status", as.character(samples$SampleID))
-
-counts <- as.data.frame(
-    f_counts$counts)
-
+counts <- readRDS(snakemake@input[["counts"]])
+print(counts)
 dds_design = snakemake@params[["design"]]
-
+print(dds_design)
 if (dds_design == 'condition') {
     dds <- DESeqDataSetFromMatrix(
         counts,
@@ -67,6 +39,11 @@ if (dds_design == 'condition') {
         counts,
         samples,
         design = ~Tissue)
+} else if (dds_design == 'genotype') {
+    dds <- DESeqDataSetFromMatrix(
+        counts,
+        samples,
+        design = ~genotype)
 }
 
 
@@ -76,11 +53,3 @@ dds <- dds[keep,]
 dds <- DESeq(dds, parallel=parallel)
 
 saveRDS(dds, file=snakemake@output[[1]])
-
-write.table(
-    as.data.frame(
-        stats),
-    file=snakemake@output[[2]],
-    quote=FALSE,
-    row.names=FALSE,
-    sep="\t")

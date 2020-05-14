@@ -13,6 +13,15 @@ rule fastqc:
     wrapper:
         "0.36.0/bio/fastqc"
 
+rule trimmed_fastqc:
+    input:
+        unpack(get_trimmed_reads)
+    output:
+        html="qc/fastqc/trimmed_{sample}.{unit,\d+}.html",
+        zip="qc/fastqc/trimmed_{sample}.{unit,\d+}_fastqc.zip"
+    wrapper:
+        "0.36.0/bio/fastqc"
+
 rule samtools_stats:
     input:
         "dedup/{sample}.{unit,\d+}.bam"
@@ -80,6 +89,7 @@ rule multiqc:
     input:
         expand(["qc/samtools-stats/{sample_unit}.txt",
                 "qc/fastqc/{sample_unit}_fastqc.zip",
+                "qc/fastqc/trimmed_{sample_unit}_fastqc.zip",
                 "qc/dedup/{sample_unit}.metrics.txt",
                 "qc/dedup/{sample_unit}.isize.pdf",
                 "qc/peaks_qc/{sample_unit}.peaks.FRiP_mqc.tsv",

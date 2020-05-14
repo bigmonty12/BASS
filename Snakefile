@@ -16,6 +16,7 @@ rule all:
                 "results/diffexp/{contrast}.ma-plot.svg"],
                contrast=config["deseq2"]["contrasts"])
 
+               #"macs2/homer/annotate.{sample_unit}.diffexp.txt"],
 
 
 # Modules #

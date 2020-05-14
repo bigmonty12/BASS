@@ -82,7 +82,7 @@ dependencies:
   - r-rcurl =1.95_4.12
   - r-reshape2 =1.4.3
   - r-rjson =0.2.20
-  - r-rlang =0.4.0
+  - r-rlang =0.4.5
   - r-rpart =4.1_15
   - r-rsqlite =2.1.2
   - r-scales =1.0.0

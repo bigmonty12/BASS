@@ -40,7 +40,8 @@ write.table(
 # heatmap
 samplesDists <- dist(t(assay(counts)))
 sampleDistMatrix <- as.matrix(samplesDists)
-
+print(snakemake@output[[1]])
+print(snakemake@output[[2]])
 write.table(
     cbind(
         sample = rownames(sampleDistMatrix),

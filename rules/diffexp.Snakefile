@@ -11,14 +11,27 @@ def get_contrast(wildcards):
    x = str(wildcards.design) + "." + str( wildcards.contrast)
    return config["deseq2"]["contrasts"][x]
 
+rule featureCounts:
+    input:
+        samples=config["deseq2"]["samples"],
+        saf="macs2/consensus_peaks.saf"
+    output:
+        counts="deseq2/featureCounts.Rds",
+        fc="qc/deseq2/featureCounts.summary"
+    conda: "../envs/deseq2.yaml"
+    log:
+        "logs/deseq2/featureCounts.log"
+    threads: get_deseq2_threads()
+    script:
+        "../scripts/featureCounts.R"
+
+
 rule deseq2_init:
     input:
         samples=config["deseq2"]["samples"],
-        # bams="dedup",
-        saf="macs2/consensus_peaks.saf"
+        counts="deseq2/featureCounts.Rds"
     output:
-        dds="deseq2/{design}.rds",
-        fc="qc/deseq2/{design}.featureCounts.summary"
+        dds="deseq2/{design}.Rds"
     params:
         design=get_design
     conda: "../envs/deseq2.yaml"
@@ -31,7 +44,7 @@ rule deseq2_init:
 
 rule pca_heatmap:
     input:
-        "deseq2/condition.rds"
+        "deseq2/genotype.Rds"
     output:
         pca="results/pca.vals.txt",
         heatplot="results/heatplot.vals.txt"
@@ -62,7 +75,7 @@ rule deseq_multiqc:
 
 rule deseq2_report:
     input:
-        rds="deseq2/{design}.rds"
+        rds="deseq2/{design}.Rds"
     output:
         table=report("results/diffexp/{design}.{contrast}.diffexp.tsv",
                      caption="../report/de_table.rst",
@@ -80,9 +93,14 @@ rule deseq2_report:
     script:
         "../scripts/deseq2.R"
 
+rule homer_diff_dirs:
+    output:
+        touch(directory("results/diffexp/homer/motifs.{design}.{contrast}"))
+
 rule annotate_diffexp:
     input:
-        "results/diffexp/{design}.{contrast}.diffexp.tsv"
+        de="results/diffexp/{design}.{contrast}.diffexp.tsv",
+        dirs="results/diffexp/homer/motifs.{design}.{contrast}"
     output:
         anno="results/diffexp/homer/annotate.{design}.{contrast}.diffexp.txt",
         stats="results/diffexp/homer/{design}.{contrast}.AnnotationStats.txt",
@@ -93,5 +111,6 @@ rule annotate_diffexp:
     shell:
         """
         perl "$CONDA_PREFIX"/share/homer-4.10-0/configureHomer.pl -install {params.genome}
-        annotatePeaks.pl {input} {params.genome} -annStats {output.stats} -go {output.go} > {output.anno}
+        annotatePeaks.pl {input.de} {params.genome} -annStats {output.stats} -go {output.go} > {output.anno}
+        findMotifsGenome.pl {input.de} {params.genome} {input.dirs} -size 50
         """
